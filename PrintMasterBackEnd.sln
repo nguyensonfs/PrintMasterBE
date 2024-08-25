@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintMaster.Api", "PrintMaster.Api\PrintMaster.Api.csproj", "{23B76A84-F0DB-4615-B1BD-F6E8C9B60046}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintMaster.Domain", "PrintMaster.Domain\PrintMaster.Domain.csproj", "{419A03A2-5816-4A67-8EF1-837CF5EE5B9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintMaster.Application", "PrintMaster.Application\PrintMaster.Application.csproj", "{B68413DA-5469-4166-A0F0-C2C203E52BF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintMaster.Infrastructure", "PrintMaster.Infrastructure\PrintMaster.Infrastructure.csproj", "{888F2D1B-885C-400C-822C-60F9716FCD7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintMaster.Commons", "PrintMaster.Commons\PrintMaster.Commons.csproj", "{D0F23F7E-C528-4705-9A7E-7ABD06225083}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23B76A84-F0DB-4615-B1BD-F6E8C9B60046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23B76A84-F0DB-4615-B1BD-F6E8C9B60046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23B76A84-F0DB-4615-B1BD-F6E8C9B60046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23B76A84-F0DB-4615-B1BD-F6E8C9B60046}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419A03A2-5816-4A67-8EF1-837CF5EE5B9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419A03A2-5816-4A67-8EF1-837CF5EE5B9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419A03A2-5816-4A67-8EF1-837CF5EE5B9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419A03A2-5816-4A67-8EF1-837CF5EE5B9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68413DA-5469-4166-A0F0-C2C203E52BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68413DA-5469-4166-A0F0-C2C203E52BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68413DA-5469-4166-A0F0-C2C203E52BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68413DA-5469-4166-A0F0-C2C203E52BF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{888F2D1B-885C-400C-822C-60F9716FCD7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{888F2D1B-885C-400C-822C-60F9716FCD7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{888F2D1B-885C-400C-822C-60F9716FCD7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{888F2D1B-885C-400C-822C-60F9716FCD7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F23F7E-C528-4705-9A7E-7ABD06225083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F23F7E-C528-4705-9A7E-7ABD06225083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F23F7E-C528-4705-9A7E-7ABD06225083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F23F7E-C528-4705-9A7E-7ABD06225083}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C6050C0-93AC-4281-ACF4-814C53923B03}
+	EndGlobalSection
+EndGlobal

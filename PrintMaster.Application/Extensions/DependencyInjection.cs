@@ -36,6 +36,7 @@ namespace PrintMaster.Application.Extensions
             services.AddScoped<IShippingMethodService, ShippingMethodService>();
             services.AddScoped<IPrintJobService, PrintJobService>();
             services.AddScoped<IDeliveryService, DeliveryService>();
+            services.AddScoped<ICustomerService, CustomerService>();
 
             return services;
         }

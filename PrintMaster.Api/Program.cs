@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PrintMaster.Api.MiddleWare;
@@ -126,6 +127,15 @@ app.UseAuthentication();
 app.UseMiddleware<ValidateJwtMiddleware>();
 
 app.UseCors("AllowOrigin");
+
+app.UseStaticFiles(); 
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Files")),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthorization();
 

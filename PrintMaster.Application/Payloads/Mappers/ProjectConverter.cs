@@ -38,6 +38,11 @@ namespace PrintMaster.Application.Payloads.Mappers
             var leader = _baseUserRepository.GetByIDAsync((Guid)project.LeaderId).Result;
             var design = _baseDesignRepository.GetAsync(item => item.ProjectId == project.Id && item.DesignStatus == Commons.Enumerates.DesignStatus.HasBeenApproved).Result;
             var printJob = design != null ? _printJobRepository.GetAsync(item => item.DesignId == design.Id).Result : null;
+
+            var imageUrl = string.IsNullOrEmpty(project.ImageDescription)
+                   ? null
+                   : $"/uploads/{project.ImageDescription}";
+
             return new DataResponseProject
             {
                 ActualEndDate = project.ActualEndDate,
@@ -60,7 +65,7 @@ namespace PrintMaster.Application.Payloads.Mappers
                 StartDate = project.StartDate,
                 StartingPrice = project.StartingPrice,
                 CommissionPercentage = project.CommissionPercentage,
-                ImageDescription = project.ImageDescription,
+                ImageDescription = imageUrl,
                 EmployeeCreateName = _baseUserRepository.GetAsync(x => x.Id == project.EmployeeCreateId).Result.FullName,
                 Designs = _baseDesignRepository.GetAllAsync(x => x.IsDeleted == false && x.ProjectId == project.Id).Result.Select(x => _designConverter.EntityToDTO(x))
             };

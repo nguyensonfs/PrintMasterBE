@@ -14,7 +14,6 @@ namespace PrintMaster.Application.InterfaceServices
         Task<ResponseMessages> ChangePassword(Guid userId, Request_ChangePassword request);
         Task<ResponseMessages> ForgotPassword(string email);
         Task<ResponseMessages> ConfirmCreateNewPassword(Request_ConfirmCreateNewPassword request);
-        Task<ResponseObject<DataResponseUser>> AddRoleToUser(Guid userId, List<string> roles);
         Task<ResponseMessages> ConfirmRegister(string confirmCode);
     }
 }

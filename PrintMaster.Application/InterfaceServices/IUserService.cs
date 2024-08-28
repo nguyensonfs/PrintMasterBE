@@ -12,6 +12,7 @@ namespace PrintMaster.Application.InterfaceServices
         Task<DataResponseUser> GetUserById(Guid id);
         Task<ResponseObject<DataResponseUser>> UpdateUser(Guid id, Request_UpdateUser request);
         Task<ResponseMessages> ChangeDepartmentForUser(Guid EmployeeId, Request_ChangeDepartmentForUser request);
+        Task<ResponseObject<DataResponseUser>> AddRoleToUser(Guid userId, List<string> roles);
         Task<IQueryable<string>> GetRolesByUserId(Guid userId);
         Task<IQueryable<DataResponseUser>> GetAllUserContainsManagerRole();
         Task<IQueryable<DataResponseUser>> GetAllUserContainsLeaderRole();

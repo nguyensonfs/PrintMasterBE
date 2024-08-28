@@ -184,5 +184,39 @@ namespace PrintMaster.Application.ImplementServices
             }
             return users.Select(x => _converter.EntityToDTO(x)).AsQueryable();
         }
+
+        public async Task<ResponseObject<DataResponseUser>> AddRoleToUser(Guid userId, List<string> roles)
+        {
+            try
+            {
+                var user = await _baseUserRepository.GetByIDAsync(userId);
+                if (user == null)
+                {
+                    return new ResponseObject<DataResponseUser>
+                    {
+                        Status = StatusCodes.Status404NotFound,
+                        Message = "Không tìm thấy thông tin người dùng",
+                        Data = null
+                    };
+                }
+                await _userRepository.AddRolesToUser(user, roles);
+                return new ResponseObject<DataResponseUser>
+                {
+                    Status = StatusCodes.Status200OK,
+                    Message = "Thêm quyền hạn cho người dùng thành công",
+                    Data = _converter.EntityToDTO(user)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseObject<DataResponseUser>
+                {
+                    Status = StatusCodes.Status500InternalServerError,
+                    Message = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
     }
 }

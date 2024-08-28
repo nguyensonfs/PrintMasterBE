@@ -129,5 +129,33 @@ namespace PrintMaster.Api.Controllers
                 return StatusCode(response.Status, response);
             }
         }
+
+        [HttpPost("{userId}/roles")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddRoleForUser(Guid userId, List<string> roles)
+        {
+            var response = await _userService.AddRoleToUser(userId, roles);
+            if (response.Status == StatusCodes.Status200OK)
+            {
+                return Ok(response);
+            }
+            else if (response.Status == StatusCodes.Status400BadRequest)
+            {
+                return BadRequest(response);
+            }
+            else if (response.Status == StatusCodes.Status404NotFound)
+            {
+                return NotFound(response);
+            }
+            else if (response.Status == StatusCodes.Status500InternalServerError)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+            else
+            {
+                return StatusCode(response.Status, response);
+            }
+        }
     }
 }

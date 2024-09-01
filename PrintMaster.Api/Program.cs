@@ -128,7 +128,6 @@ app.UseMiddleware<ValidateJwtMiddleware>();
 
 app.UseCors("AllowOrigin");
 
-app.UseStaticFiles(); 
 
 app.UseStaticFiles(new StaticFileOptions
 {

@@ -89,7 +89,7 @@ namespace PrintMaster.Application.ImplementServices
                     design.ApproverId = Guid.Parse(currentUser.FindFirst("Id").Value);
                     await _baseDesignRepository.UpdateAsync(design);
                     project.Status = Commons.Enumerates.ProjectStatus.Approved;
-                    project.Progress = 50;
+                    project.Progress = 25;
                     await _baseProjectReposiroty.UpdateAsync(project);
 
                     Notification notification = new Notification
@@ -209,7 +209,6 @@ namespace PrintMaster.Application.ImplementServices
                 };
                 design = await _baseDesignRepository.CreateAsync(design);
                 project.Status = Commons.Enumerates.ProjectStatus.AwaitingApproval;
-                project.Progress = 25;
                 await _baseProjectReposiroty.UpdateAsync(project);
                 return new ResponseObject<DataResponseDesign>
                 {

@@ -26,18 +26,20 @@ namespace PrintMaster.Application.Payloads.Mappers
         public DataResponseDesign EntityToDTO(Design design)
         {
             var designer = _baseUserRepository.GetByIDAsync((Guid)design.DesignerId);
-
-            var Approver = "";
+            var approverName = "";
             if (design.ApproverId.HasValue)
             {
                 var approver = _baseUserRepository.GetAsync(x => x.Id == design.ApproverId.Value).Result;
-                Approver = approver?.FullName ?? "";
+                approverName = approver?.FullName ?? "";
             }
+            var imageUrl = string.IsNullOrEmpty(design.FilePath)
+                   ? null
+                   : $"/uploads/{design.FilePath}";
             return new DataResponseDesign
             {
-                Approver = Approver,
+                Approver = approverName,
                 Designer = designer.Result.FullName,
-                DesignImage = design.FilePath,
+                DesignImage = imageUrl,
                 DesignStatus = design.DesignStatus.ToString(),
                 DesignTime = design.DesignTime,
                 Id = design.Id

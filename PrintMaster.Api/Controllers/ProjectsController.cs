@@ -109,31 +109,35 @@ namespace PrintMaster.Api.Controllers
             }
         }
 
-        [HttpPatch("{projectId}/designs/{designId}/approve")]
+        [HttpPatch("{projectId}/designs/{designId}/approval")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Consumes(contentType: "multipart/form-data")]
         public async Task<IActionResult> ApprovalDesign([FromForm] Request_DesignApproval request, Guid projectId, Guid designId)
         {
-            var response = await _designService.ApprovalDesign( projectId, designId, request);
-            if (response.Status == StatusCodes.Status200OK)
+            var result = await _designService.ApprovalDesign( projectId, designId, request);
+            if (result.Status == StatusCodes.Status200OK)
             {
-                return Ok(response);
+                return Ok(result.Message);
             }
-            else if (response.Status == StatusCodes.Status400BadRequest)
+            else if (result.Status == StatusCodes.Status400BadRequest)
             {
-                return BadRequest(response);
+                return BadRequest(result.Message);
             }
-            else if (response.Status == StatusCodes.Status404NotFound)
+            else if (result.Status == StatusCodes.Status401Unauthorized)
             {
-                return NotFound(response);
+                return Unauthorized(result.Message);
             }
-            else if (response.Status == StatusCodes.Status500InternalServerError)
+            else if (result.Status == StatusCodes.Status403Forbidden)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
+                return Forbid(result.Message);
+            }
+            else if (result.Status == StatusCodes.Status404NotFound)
+            {
+                return NotFound(result.Message);
             }
             else
             {
-                return StatusCode(response.Status, response);
+                return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
             }
         }
         [HttpGet]

@@ -39,7 +39,7 @@ namespace PrintMaster.Application.ImplementServices
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<ResponseMessages> ApprovalDesign( Guid ProjectId, Guid DesignId, Request_DesignApproval request)
+        public async Task<ResponseMessages> ApprovalDesign(Guid ProjectId, Guid DesignId, Request_DesignApproval request)
         {
             var currentUser = _httpContextAccessor.HttpContext.User;
             var leader = currentUser.FindFirst("Id").Value;
@@ -47,52 +47,76 @@ namespace PrintMaster.Application.ImplementServices
             {
                 if (!currentUser.Identity.IsAuthenticated)
                 {
-                    return new ResponseMessages { Message = "Người dùng chưa được xác thực",Status = StatusCodes.Status401Unauthorized };
+                    return new ResponseMessages
+                    {
+                        Message = "Người dùng chưa được xác thực",
+                        Status = StatusCodes.Status401Unauthorized
+                    };
                 }
                 if (!currentUser.IsInRole("Leader"))
-                { 
+                {
                     return new ResponseMessages
                     {
                         Message = "Bạn không có quyền thực hiện chức năng này",
-                        Status = StatusCodes.Status400BadRequest
+                        Status = StatusCodes.Status403Forbidden
                     };
                 }
                 var design = await _baseDesignRepository.GetByIDAsync(DesignId);
                 if (design == null)
                 {
-                    return new ResponseMessages { Message = "Không tìm thấy thiết kế", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Không tìm thấy thiết kế",
+                        Status = StatusCodes.Status404NotFound
+                    };
                 }
                 var project = await _baseProjectReposiroty.GetByIDAsync(ProjectId);
                 if (project == null)
                 {
-                    return new ResponseMessages { Message = "Không tìm thấy dự án", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Không tìm thấy dự án",
+                        Status = StatusCodes.Status404NotFound
+                    };
                 }
                 if (Guid.Parse(leader) != project.LeaderId)
                 {
-                    return new ResponseMessages { Message = "Bạn không phải là leader của dự án này", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Bạn không phải là leader của dự án này",
+                        Status = StatusCodes.Status403Forbidden
+                    };
                 }
-                if (design.DesignStatus.ToString().Equals("HasBeenApproved"))
+                if (design.DesignStatus == Commons.Enumerates.DesignStatus.HasBeenApproved)
                 {
-                    return new ResponseMessages { Message = "Thiết kế này đã được duyệt trước đó", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Thiết kế này đã được duyệt trước đó",
+                        Status = StatusCodes.Status400BadRequest
+                    };
                 }
                 var listDesign = await _baseDesignRepository.GetAllAsync(record => record.ProjectId == project.Id
-                && record.IsDeleted == false
-                && record.DesignerId == design.DesignerId
-                && record.DesignStatus == Commons.Enumerates.DesignStatus.HasBeenApproved);
+                    && !record.IsDeleted
+                    && record.DesignerId == design.DesignerId
+                    && record.DesignStatus == Commons.Enumerates.DesignStatus.HasBeenApproved);
                 if (listDesign.ToList().Count >= 1)
                 {
-                    return new ResponseMessages { Message = "Đã có thiết kế được duyệt trước đó", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Đã có thiết kế được duyệt trước đó",
+                        Status = StatusCodes.Status400BadRequest
+                    };
                 }
                 if (request.DesignApproval.ToString().Equals("Agree"))
                 {
                     design.DesignStatus = Commons.Enumerates.DesignStatus.HasBeenApproved;
-                    design.ApproverId = Guid.Parse(currentUser.FindFirst("Id").Value);
+                    design.ApproverId = Guid.Parse(leader);
                     await _baseDesignRepository.UpdateAsync(design);
                     project.Status = Commons.Enumerates.ProjectStatus.Approved;
                     project.Progress = 25;
                     await _baseProjectReposiroty.UpdateAsync(project);
 
-                    Notification notification = new Notification
+                    var notification = new Notification
                     {
                         IsDeleted = false,
                         Content = "Thiết kế của bạn đã được duyệt",
@@ -103,14 +127,19 @@ namespace PrintMaster.Application.ImplementServices
                     };
 
                     notification = await _notificationRepository.CreateAsync(notification);
-                    return new ResponseMessages { Message = "Đã duyệt thiết kế", Status = StatusCodes.Status200OK };
+                    return new ResponseMessages
+                    {
+                        Message = "Đã duyệt thiết kế",
+                        Status = StatusCodes.Status200OK
+                    };
                 }
                 else
                 {
                     design.DesignStatus = Commons.Enumerates.DesignStatus.Refuse;
-                    design.ApproverId = Guid.Parse(currentUser.FindFirst("Id").Value);
+                    design.ApproverId = Guid.Parse(leader);
                     await _baseDesignRepository.UpdateAsync(design);
-                    Notification notification = new Notification
+
+                    var notification = new Notification
                     {
                         IsDeleted = false,
                         Content = "Thiết kế của bạn bị từ chối phê duyệt",
@@ -121,12 +150,20 @@ namespace PrintMaster.Application.ImplementServices
                     };
 
                     notification = await _notificationRepository.CreateAsync(notification);
-                    return new ResponseMessages { Message = "Không duyệt thiết kế", Status = StatusCodes.Status400BadRequest };
+                    return new ResponseMessages
+                    {
+                        Message = "Không duyệt thiết kế",
+                        Status = StatusCodes.Status200OK
+                    };
                 }
             }
             catch (Exception ex)
             {
-                return new ResponseMessages { Message = $"Có lỗi: {ex}", Status = StatusCodes.Status400BadRequest };
+                return new ResponseMessages
+                {
+                    Message = $"Có lỗi: {ex.Message}",
+                    Status = StatusCodes.Status500InternalServerError
+                };
             }
         }
 

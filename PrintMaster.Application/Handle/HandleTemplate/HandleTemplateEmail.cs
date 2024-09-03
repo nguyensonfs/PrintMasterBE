@@ -1159,7 +1159,7 @@ namespace PrintMaster.Application.Handle.HandleTemplate
                                         >
                                           <a
                                             target=""_blank""
-                                            href=""https://www.facebook.com/minhquantb00""
+                                            href=""#""
                                             style=""
                                               -webkit-text-size-adjust: none;
                                               -ms-text-size-adjust: none;
@@ -1242,7 +1242,7 @@ namespace PrintMaster.Application.Handle.HandleTemplate
                                         >
                                           <a
                                             target=""_blank""
-                                            href=""https://www.youtube.com/channel/UC3CVoJo3JI7LWjD1-ezBWBA""
+                                            href=""#""
                                             style=""
                                               -webkit-text-size-adjust: none;
                                               -ms-text-size-adjust: none;

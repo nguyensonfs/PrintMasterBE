@@ -19,6 +19,8 @@ namespace PrintMaster.Application.Extensions
             services.AddScoped<PrintJobConverter>();
             services.AddScoped<ResourcePropertyDetailConverter>();
             services.AddScoped<DeliveryConverter>();
+            services.AddScoped<ResourceConverter>();
+            services.AddScoped<ResourcePropertyConverter>();
 
             return services;
         }
@@ -37,6 +39,7 @@ namespace PrintMaster.Application.Extensions
             services.AddScoped<IPrintJobService, PrintJobService>();
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IResourceService, ResourceService>();
 
             return services;
         }

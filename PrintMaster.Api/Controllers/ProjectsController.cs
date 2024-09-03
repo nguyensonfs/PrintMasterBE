@@ -117,27 +117,27 @@ namespace PrintMaster.Api.Controllers
             var result = await _designService.ApprovalDesign( projectId, designId, request);
             if (result.Status == StatusCodes.Status200OK)
             {
-                return Ok(result.Message);
+                return Ok(result);
             }
             else if (result.Status == StatusCodes.Status400BadRequest)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
             else if (result.Status == StatusCodes.Status401Unauthorized)
             {
-                return Unauthorized(result.Message);
+                return Unauthorized(result);
             }
             else if (result.Status == StatusCodes.Status403Forbidden)
             {
-                return Forbid(result.Message);
+                return StatusCode(StatusCodes.Status403Forbidden, result);
             }
             else if (result.Status == StatusCodes.Status404NotFound)
             {
-                return NotFound(result.Message);
+                return NotFound(result);
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
         }
         [HttpGet]

@@ -250,7 +250,7 @@ namespace PrintMaster.Application.ImplementServices
             var smtpClient = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential("minhquantb00@gmail.com", "jvztzxbtyugsiaea"),
+                Credentials = new NetworkCredential("krbabuto@gmail.com", "eutf zgwj ygii yzmb"),
                 EnableSsl = true
             };
             try
@@ -413,7 +413,7 @@ namespace PrintMaster.Application.ImplementServices
                 var resourceProperty = await _resourcePropertyRepo.GetAsync(x => x.Id == resource.ResourcePropertyId);
                 var resourceItem = await _resourceRepo.GetAsync(x => x.Id == resourceProperty.ResourceId);
                 var resourceType = await _resourceTypeRepo.GetAsync(x => x.Id == resourceItem.ResourceTypeId);
-                if (!resourceType.NameOfResourceType.Equals("Machines"))
+                if (!resourceType.NameOfResourceType.Equals("Non-consumable"))
                 {
                     resource.Quantity -= request.Quantity;
                     await _baseResourceRepository.UpdateAsync(resource);

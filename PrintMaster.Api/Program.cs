@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PrintMaster.Api.MiddleWare;
 using PrintMaster.Application.Extensions;
 using PrintMaster.Application.Handle.HandleEmail;
 using PrintMaster.Application.ImplementServices;
@@ -124,7 +123,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
-app.UseMiddleware<ValidateJwtMiddleware>();
 
 app.UseCors("AllowOrigin");
 

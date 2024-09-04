@@ -27,7 +27,6 @@ namespace PrintMaster.Application.Extensions
 
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
-            services.AddScoped<IBlacklistedTokenService, BlacklistedTokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITeamService, TeamService>();

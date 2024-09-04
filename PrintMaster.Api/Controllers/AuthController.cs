@@ -12,13 +12,13 @@ namespace PrintMaster.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IBlacklistedTokenService _blacklistedTokenService;
 
-        public AuthController(IAuthService authService,
-                              IBlacklistedTokenService blacklistedTokenService)
+
+        public AuthController(IAuthService authService
+                             )
         {
             _authService = authService;
-            _blacklistedTokenService = blacklistedTokenService;
+
         }
 
         [HttpPost]
@@ -168,21 +168,6 @@ namespace PrintMaster.Api.Controllers
             {
                 return StatusCode(response.Status, response);
             }
-        }
-
-
-        [HttpPost]
-        public IActionResult Logout()
-        {
-            string token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            if (string.IsNullOrEmpty(token))
-            {
-                return BadRequest("Không tìm thấy token.");
-            }
-
-            var tokenExpiration = new TimeSpan(0, 0, 10);
-            _blacklistedTokenService.BlacklistToken(token, tokenExpiration);
-            return Ok("Đăng xuất thành công.");
         }
     }
 }

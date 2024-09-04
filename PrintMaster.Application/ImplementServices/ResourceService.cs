@@ -18,15 +18,14 @@ namespace PrintMaster.Application.ImplementServices
             _converter = converter;
         }
 
-        public async Task<PageResult<DataResponseResource>> GetAllRosources(string? resourceName, int pageSize, int pageNumber)
+        public async Task<IQueryable<DataResponseResource>> GetAllResources(string? resourceName)
         {
             var query = await _baseResourceRepository.GetAllAsync(record => record.IsDeleted == false);
             if (!string.IsNullOrEmpty(resourceName))
             {
                 query = query.Where(x => x.ResourceName.ToLower().Contains(resourceName.ToLower()));
             }
-            var dto = query.Select(x => _converter.EntityToDTO(x));
-            var result = Pagination.GetPagedData(dto, pageSize, pageNumber);
+            var result = query.Select(x => _converter.EntityToDTO(x));
             return result;
         }
     }

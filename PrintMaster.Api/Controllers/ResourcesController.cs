@@ -15,11 +15,11 @@ namespace PrintMaster.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllRoles(string? resourceName, int pageSize = 10, int pageNumber = 1)
+        public async Task<IActionResult> GetAllRosources(string? resourceName)
         {
             try
             {
-                var response = await _resourceService.GetAllRosources(resourceName, pageSize, pageNumber);
+                var response = await _resourceService.GetAllResources(resourceName);
                 return Ok(response);
             }
             catch (Exception ex)

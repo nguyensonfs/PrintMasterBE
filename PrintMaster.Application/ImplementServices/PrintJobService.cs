@@ -91,186 +91,6 @@ namespace PrintMaster.Application.ImplementServices
             _resourceTypeRepo = resourceTypeRepo;
         }
 
-        public async Task<ResponseObject<DataResponsePrintJob>> ConfirmDonePrintJob(Guid printJobId)
-        {
-            var currentUser = _contextAccessor.HttpContext.User;
-            try
-            {
-                if (!currentUser.Identity.IsAuthenticated)
-                {
-                    return new ResponseObject<DataResponsePrintJob>
-                    {
-                        Status = StatusCodes.Status401Unauthorized,
-                        Message = "Người dùng chưa được xác thực",
-                        Data = null
-                    };
-                }
-                if (!currentUser.IsInRole("Leader"))
-                {
-                    return new ResponseObject<DataResponsePrintJob>
-                    {
-                        Status = StatusCodes.Status403Forbidden,
-                        Message = "Bạn không có quyền thực hiện chức năng này",
-                        Data = null
-                    };
-                }
-                var printJob = await _basePrintJobRepository.GetByIDAsync(printJobId);
-                if (printJob == null)
-                {
-                    return new ResponseObject<DataResponsePrintJob>
-                    {
-                        Status = StatusCodes.Status404NotFound,
-                        Message = "Thông tin in ấn không tồn tại"
-                    };
-                }
-                var design = await _baseDesignRepository.GetByIDAsync(printJob.DesignId);
-
-                printJob.PrintJobStatus = Commons.Enumerates.PrintJobStatus.Completed;
-                await _basePrintJobRepository.UpdateAsync(printJob);
-
-
-
-                var project = await _baseProjectRepository.GetByIDAsync(design.ProjectId);
-                if (project == null)
-                {
-                    return new ResponseObject<DataResponsePrintJob>
-                    {
-                        Status = StatusCodes.Status404NotFound,
-                        Message = "Không tìm thấy dự án",
-                        Data = null
-                    };
-                }
-                project.Status = Commons.Enumerates.ProjectStatus.Completed;
-                project.Progress = 100;
-                project.ActualEndDate = DateTime.Now;
-                await _baseProjectRepository.UpdateAsync(project);
-                var resourceForProject = await _baseResourceForPrintJobRepository.GetAllAsync(x => x.PrintJobId == printJobId);
-                foreach (var resource in resourceForProject)
-                {
-                    var resourceDetail = await _baseResourceRepository.GetAsync(x => x.Id == resource.ResourcePropertyDetailId);
-                    project.StartingPrice += resourceDetail.Price * resourceDetail.Quantity;
-                }
-                await _baseProjectRepository.UpdateAsync(project);
-                var kpi = await _keyPerformanceIndicatorsRepository.GetAsync(x => x.EmployeeId == project.EmployeeCreateId);
-                if (kpi != null)
-                {
-                    kpi.ActuallyAchieved += 1;
-                    await _keyPerformanceIndicatorsRepository.UpdateAsync(kpi);
-                    if (kpi.ActuallyAchieved >= kpi.Target)
-                    {
-
-                        kpi.AchieveKPI = true;
-                        await _keyPerformanceIndicatorsRepository.UpdateAsync(kpi);
-                        Notification notification = new Notification
-                        {
-                            IsDeleted = false,
-                            Content = $"Chúc mừng bạn đã hoàn thành KPI! chúng tôi sẽ có hình thức khen thưởng đối với bạn",
-                            Id = Guid.NewGuid(),
-                            IsSeen = false,
-                            Link = "",
-                            UserId = project.EmployeeCreateId
-                        };
-                        notification = await _notificationRepository.CreateAsync(notification);
-                    }
-                }
-
-                var listUsers = await _baseUserRepository.GetAllAsync(x => x.IsDeleted == false);
-                List<User> users = new List<User>();
-                foreach (var user in listUsers)
-                {
-                    var roleOfUser = await _userRepository.GetRolesOfUserAsync(user);
-                    var team = await _teamRepository.GetAsync(x => x.Id == user.TeamId);
-                    if ((roleOfUser.Contains("Manager") && team.Name.Equals("Delivery")) || roleOfUser.Contains("Admin"))
-                    {
-                        users.Add(user);
-                    }
-                }
-                foreach (var user in users)
-                {
-                    Notification notification = new Notification
-                    {
-                        IsDeleted = false,
-                        Content = $"Qúa trình in ấn đã hoàn thành! Có thể giao cho khách hàng",
-                        Id = Guid.NewGuid(),
-                        IsSeen = false,
-                        Link = "",
-                        UserId = user.Id
-                    };
-                    notification = await _notificationRepository.CreateAsync(notification);
-                }
-                var customer = await _customerRepository.GetByIDAsync(project.CustomerId);
-
-                var totalMoney = project.StartingPrice;
-
-                Bill bill = new Bill
-                {
-                    IsDeleted = false,
-                    BillName = $"Hóa đơn chi tiết cho dự án {project.ProjectName}! Bạn vui lòng kiểm tra",
-                    BillStatus = Commons.Enumerates.BillStatus.UnPaid,
-                    CustomerId = customer.Id,
-                    EmployeeId = project.EmployeeCreateId,
-                    ProjectId = project.Id,
-                    CreateTime = DateTime.Now,
-                    Id = Guid.NewGuid(),
-                    TotalMoney = project.StartingPrice,
-                    TradingCode = "PrintMaster_" + DateTime.Now.Ticks,
-                };
-                bill = await _billRepository.CreateAsync(bill);
-                var message = SendEmail(new EmailTo
-                {
-                    Mail = customer.Email,
-                    Subject = "Thông tin đơn hàng của bạn: ",
-                    Content = HandleTemplateEmail.GenerateNotificationBillEmail(bill)
-                });
-                var leader = await _baseUserRepository.GetByIDAsync(project.LeaderId);
-                if (leader != null)
-                {
-                    await _userRepository.DeleteRolesOfUserAsync(leader, new List<string> { "Leader" });
-                }
-
-                return new ResponseObject<DataResponsePrintJob>
-                {
-                    Status = StatusCodes.Status200OK,
-                    Message = "Đã hoàn thành in ấn",
-                    Data = _printerConverter.EntityToDTO(printJob)
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseObject<DataResponsePrintJob>
-                {
-                    Status = StatusCodes.Status500InternalServerError,
-                    Message = ex.Message,
-                    Data = null
-                };
-            }
-        }
-        public string SendEmail(EmailTo emailTo)
-        {
-            var smtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("krbabuto@gmail.com", "eutf zgwj ygii yzmb"),
-                EnableSsl = true
-            };
-            try
-            {
-                var message = new MailMessage();
-                message.From = new MailAddress("krbabuto@gmail.com");
-                message.To.Add(emailTo.Mail);
-                message.Subject = emailTo.Subject;
-                message.Body = emailTo.Content;
-                message.IsBodyHtml = true;
-                smtpClient.Send(message);
-
-                return "Xác nhận gửi email thành công, lấy mã để xác thực";
-            }
-            catch (Exception ex)
-            {
-                return "Lỗi khi gửi email: " + ex.Message;
-            }
-        }
-
         public async Task<ResponseObject<DataResponsePrintJob>> CreatePrintJob(Request_CreatePrintJob request)
         {
             var currentUser = _contextAccessor.HttpContext.User;
@@ -319,7 +139,7 @@ namespace PrintMaster.Application.ImplementServices
                     IsDeleted = false,
                     DesignId = request.DesignId,
                     Id = Guid.NewGuid(),
-                    PrintJobStatus = Commons.Enumerates.PrintJobStatus.Printing,
+                    PrintJobStatus = Commons.Enumerates.PrintJobStatus.Completed,
                 };
                 await _basePrintJobRepository.CreateAsync(printJob);
                 printJob.ResourceForPrints = await CreateListResourceForPrintJob(printJob.Id, request.ResourceForPrints);
@@ -337,16 +157,21 @@ namespace PrintMaster.Application.ImplementServices
                         Data = null
                     };
                 }
-                project.Status = Commons.Enumerates.ProjectStatus.InProgress;
-                project.Progress = 75;
+                project.Status = Commons.Enumerates.ProjectStatus.Completed;
+                project.Progress = 100;
+                project.ActualEndDate = DateTime.Now;
                 await _baseProjectRepository.UpdateAsync(project);
 
+                var customer = await _customerRepository.GetByIDAsync(project.CustomerId);
+
+                var message = new EmailMessage(new string[] { customer.Email }, "Thông báo", $"Thiết kế bạn đặt đã hoàn thành");
+                var responseMessage = _emailService.SendEmail(message);
 
                 var notification = await CreateNotification(project.Id);
                 return new ResponseObject<DataResponsePrintJob>
                 {
                     Status = StatusCodes.Status200OK,
-                    Message = "Đã bắt đầu quy trình in ấn",
+                    Message = "In ấn đã hoàn thành",
                     Data = _printerConverter.EntityToDTO(printJob)
                 };
             }
@@ -367,7 +192,7 @@ namespace PrintMaster.Application.ImplementServices
             Notification notification = new Notification
             {
                 IsDeleted = false,
-                Content = $"Thiết kế của dự án {project.ProjectName} bắt đầu được in!",
+                Content = $"Thiết kế của dự án {project.ProjectName} đã được được in!",
                 Id = Guid.NewGuid(),
                 IsSeen = false,
                 Link = "",

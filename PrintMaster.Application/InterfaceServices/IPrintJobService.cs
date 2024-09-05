@@ -7,7 +7,6 @@ namespace PrintMaster.Application.InterfaceServices
     public interface IPrintJobService
     {
         Task<ResponseObject<DataResponsePrintJob>> CreatePrintJob(Request_CreatePrintJob request);
-        Task<ResponseObject<DataResponsePrintJob>> ConfirmDonePrintJob(Guid printJobId);
         Task<IQueryable<DataResponsePrintJob>> GetAllPrintJobs();
         Task<ResponseObject<DataResponsePrintJob>> GetPrintJobById(Guid printJobId);
     }

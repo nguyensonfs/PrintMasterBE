@@ -8,11 +8,6 @@ using PrintMaster.Application.Payloads.ResponseModels.DataDelivery;
 using PrintMaster.Application.Payloads.Responses;
 using PrintMaster.Domain.Entities;
 using PrintMaster.Domain.InterfaceRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PrintMaster.Application.ImplementServices
 {

@@ -1,9 +1,6 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PrintMaster.Application.ImplementServices;
 using PrintMaster.Application.InterfaceServices;
 using PrintMaster.Application.Payloads.RequestModels.PrintJobRequests;
 
@@ -47,31 +44,6 @@ namespace PrintMaster.Api.Controllers
             }
         }
 
-        [HttpPut("{printJobId}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> ConfirmDonePrintJob([FromRoute] Guid printJobId)
-        {
-            var response = await _jobService.ConfirmDonePrintJob(printJobId);
-            if (response.Status == StatusCodes.Status200OK)
-            {
-                return Ok(response);
-            }
-            else if (response.Status == StatusCodes.Status400BadRequest)
-            {
-                return BadRequest(response);
-            }
-            else if (response.Status == StatusCodes.Status404NotFound)
-            {
-                return NotFound(response);
-            }
-            else if (response.Status == StatusCodes.Status500InternalServerError)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-            else
-            {
-                return StatusCode(response.Status, response);
-            }
-        }
+
     }
 }

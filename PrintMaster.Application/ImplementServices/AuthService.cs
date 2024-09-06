@@ -163,7 +163,7 @@ namespace PrintMaster.Application.ImplementServices
                 ConfirmEmail confirmEmail = new ConfirmEmail
                 {
                     ConfirmCode = StringUltilities.GenerateCodeActive(),
-                    ExpiryTime = DateTime.Now.AddMinutes(1),
+                    ExpiryTime = DateTime.Now.AddMinutes(3),
                     Id = Guid.NewGuid(),
                     IsConfirm = false,
                     UserId = user.Id
@@ -390,7 +390,7 @@ namespace PrintMaster.Application.ImplementServices
                 {
                     Id = Guid.NewGuid(),
                     ConfirmCode = StringUltilities.GenerateCodeActive(),
-                    ExpiryTime = DateTime.Now.AddMinutes(1),
+                    ExpiryTime = DateTime.Now.AddMinutes(5),
                     IsConfirm = false,
                     UserId = user.Id,
                 };

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Asn1.Ocsp;
 using PrintMaster.Application.InterfaceServices;
+using PrintMaster.Application.Payloads.Mappers;
 using PrintMaster.Application.Payloads.RequestModels.ShippingMethodRequests;
+using PrintMaster.Application.Payloads.ResponseModels.DataCustomer;
 using PrintMaster.Application.Payloads.ResponseModels.DataShippingMethod;
 using PrintMaster.Application.Payloads.Responses;
 using PrintMaster.Domain.Entities;
@@ -75,6 +78,24 @@ namespace PrintMaster.Application.ImplementServices
                     Message = ex.Message,
                     Data = null
                 };
+            }
+        }
+
+        public async Task<IQueryable<DataResponseShippingMethod>> GetAllShippingMethod()
+        {
+            try
+            {
+                var query = await _baseReposiroty.GetAllAsync(record => record.IsDeleted == false);
+
+                return query.Select(item => new DataResponseShippingMethod
+                {
+                    Id = item.Id,
+                    ShippingMethodName = item.ShippingMethodName,
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
             }
         }
     }

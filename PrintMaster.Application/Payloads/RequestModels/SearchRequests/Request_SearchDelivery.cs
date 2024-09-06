@@ -1,8 +1,8 @@
 ﻿using PrintMaster.Commons.Enumerates;
 
-namespace PrintMaster.Application.Payloads.RequestModels.InputRequests
+namespace PrintMaster.Application.Payloads.RequestModels.SearchRequests
 {
-    public class Request_InputDelivery
+    public class Request_SearchDelivery
     {
         public Guid? ProjectId { get; set; }
         public Guid? DeliverId { get; set; }

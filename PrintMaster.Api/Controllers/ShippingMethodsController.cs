@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PrintMaster.Application.InterfaceServices;
 using PrintMaster.Application.Payloads.RequestModels.ShippingMethodRequests;
 
@@ -16,6 +18,7 @@ namespace PrintMaster.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Create(Request_CreateShippingMethod request)
         {
             var response = await _shippingMethodService.CreateShippingMethod(request);
@@ -39,6 +42,14 @@ namespace PrintMaster.Api.Controllers
             {
                 return StatusCode(response.Status, response);
             }
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetAllShippingMethods()
+        {
+            var result = await _shippingMethodService.GetAllShippingMethod();
+            return Ok(result);
         }
     }
 }

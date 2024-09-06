@@ -450,9 +450,16 @@ namespace PrintMaster.Infrastructure.Extensions
                     {
                         Id = Guid.NewGuid(),
                         IsDeleted = false,
-                        ShippingMethodName = "Chuyển Phát Nhanh"
+                        ShippingMethodName = "Chuyển phát nhanh"
+                    },
+                    new ShippingMethod
+                    {
+                        Id = Guid.NewGuid(),
+                        IsDeleted = false,
+                        ShippingMethodName = "Vận chuyển hoả tốc"
                     }
                     );
+                _context.SaveChanges();
             }
         }
     }

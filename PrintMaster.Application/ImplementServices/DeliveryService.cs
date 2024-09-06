@@ -4,6 +4,7 @@ using PrintMaster.Application.InterfaceServices;
 using PrintMaster.Application.Payloads.Mappers;
 using PrintMaster.Application.Payloads.RequestModels.DeliveryRequests;
 using PrintMaster.Application.Payloads.RequestModels.InputRequests;
+using PrintMaster.Application.Payloads.RequestModels.SearchRequests;
 using PrintMaster.Application.Payloads.ResponseModels.DataDelivery;
 using PrintMaster.Application.Payloads.Responses;
 using PrintMaster.Domain.Entities;
@@ -180,12 +181,12 @@ namespace PrintMaster.Application.ImplementServices
             }
         }
 
-        public async Task<ResponseObject<DataResponseDelivery>> ShipperConfirmDelivery(Guid shipperId, Request_ShipperConfirmDelivery request)
+        public async Task<ResponseObject<DataResponseDelivery>> ConfirmOrderDeliveryCompletionByShipper(Guid shipperId, Guid deliveryId, Request_ShipperConfirmDelivery request)
         {
-            var deliver = await _baseUserRepository.GetByIDAsync(shipperId);
+            var shipper = await _baseUserRepository.GetByIDAsync(shipperId);
             try
             {
-                var team = await _teamRepository.GetAsync(x => x.Id == deliver.TeamId);
+                var team = await _teamRepository.GetAsync(x => x.Id == shipper.TeamId);
                 if (team == null)
                 {
                     return new ResponseObject<DataResponseDelivery>
@@ -195,7 +196,7 @@ namespace PrintMaster.Application.ImplementServices
                         Data = null
                     };
                 }
-                if (!_userRepository.GetRolesOfUserAsync(deliver).Result.Contains("Deliver") || !team.Name.Equals("Delivery"))
+                if (!_userRepository.GetRolesOfUserAsync(shipper).Result.Contains("Deliver") || !team.Name.Equals("Delivery"))
                 {
                     return new ResponseObject<DataResponseDelivery>
                     {
@@ -204,7 +205,7 @@ namespace PrintMaster.Application.ImplementServices
                         Data = null
                     };
                 }
-                var delivery = await _baseDeliveryRepository.GetByIDAsync(request.DeliveryId);
+                var delivery = await _baseDeliveryRepository.GetByIDAsync(deliveryId);
                 if (delivery == null)
                 {
                     return new ResponseObject<DataResponseDelivery>
@@ -232,8 +233,7 @@ namespace PrintMaster.Application.ImplementServices
                         Data = null
                     };
                 }
-                delivery.DeliveryStatus = Commons.Enumerates.DeliveryStatus.Delivering;
-                deliver.UpdateTime = DateTime.Now;
+                shipper.UpdateTime = DateTime.Now;
                 await _baseDeliveryRepository.UpdateAsync(delivery);
 
                 var project = await _projectRepository.GetAsync(x => x.Id == delivery.ProjectId);
@@ -246,14 +246,8 @@ namespace PrintMaster.Application.ImplementServices
                 var responseMessage = _emailService.SendEmail(message);
 
 
-                var bill = await _billRepository.GetAsync(x => x.ProjectId == project.Id
-                && x.BillStatus == Commons.Enumerates.BillStatus.UnPaid);
-                if (bill != null)
-                {
-                    bill.BillStatus = Commons.Enumerates.BillStatus.Paid;
-                    await _billRepository.UpdateAsync(bill);
-                }
-                delivery.DeliveryStatus = Commons.Enumerates.DeliveryStatus.Delivered;
+                
+                delivery.DeliveryStatus = request.Status;
                 await _baseDeliveryRepository.UpdateAsync(delivery);
                 project.Status = Commons.Enumerates.ProjectStatus.Delivered;
                 await _projectRepository.UpdateAsync(project);
@@ -276,8 +270,7 @@ namespace PrintMaster.Application.ImplementServices
             }
         }
 
-        public async Task<ResponseObject<DataResponseDelivery>> ShipperConfirmOrderDelivery(Guid shipperId,
-                                                                                            Request_ShipperConfirmOrderDelivery request)
+        public async Task<ResponseObject<DataResponseDelivery>> ConfirmDeliveryTaskByShipper(Guid shipperId, Guid deliveryId)
         {
             var deliver = await _baseUserRepository.GetByIDAsync(shipperId);
             try
@@ -301,7 +294,7 @@ namespace PrintMaster.Application.ImplementServices
                         Data = null
                     };
                 }
-                var delivery = await _baseDeliveryRepository.GetByIDAsync(request.DeliveryId);
+                var delivery = await _baseDeliveryRepository.GetByIDAsync(deliveryId);
                 if (delivery == null)
                 {
                     return new ResponseObject<DataResponseDelivery>
@@ -318,6 +311,15 @@ namespace PrintMaster.Application.ImplementServices
                         Status = StatusCodes.Status400BadRequest,
                         Data = null,
                         Message = "Bạn không phải là người giao đơn hàng này"
+                    };
+                }
+                if (delivery.DeliveryStatus.ToString().Equals("Delivering"))
+                {
+                    return new ResponseObject<DataResponseDelivery>
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Message = "Đơn hàng đang được giao",
+                        Data = null
                     };
                 }
                 if (delivery.DeliveryStatus.ToString().Equals("Delivered"))
@@ -370,24 +372,24 @@ namespace PrintMaster.Application.ImplementServices
                 };
             }
         }
-        public async Task<IQueryable<DataResponseDelivery>> GetAllDelivery(Request_InputDelivery input)
+        public async Task<IQueryable<DataResponseDelivery>> GetAllDelivery(Request_SearchDelivery search)
         {
             var query = await _baseDeliveryRepository.GetAllAsync(record => record.IsDeleted == false);
-            if (input.ProjectId.HasValue)
+            if (search.ProjectId.HasValue)
             {
-                query = query.Where(record => record.ProjectId == input.ProjectId);
+                query = query.Where(record => record.ProjectId == search.ProjectId);
             }
-            if (input.CustomerId.HasValue)
+            if (search.CustomerId.HasValue)
             {
-                query = query.Where(record => record.CustomerId == input.CustomerId);
+                query = query.Where(record => record.CustomerId == search.CustomerId);
             }
-            if (input.DeliverId.HasValue)
+            if (search.DeliverId.HasValue)
             {
-                query = query.Where(record => record.DeliverId == input.DeliverId);
+                query = query.Where(record => record.DeliverId == search.DeliverId);
             }
-            if (input.DeliveryStatus.HasValue)
+            if (search.DeliveryStatus.HasValue)
             {
-                query = query.Where(record => record.DeliveryStatus == input.DeliveryStatus);
+                query = query.Where(record => record.DeliveryStatus == search.DeliveryStatus);
             }
             return query.Select(item => _deliveryConverter.EntityToDTO(item));
         }

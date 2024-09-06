@@ -90,6 +90,16 @@ namespace PrintMaster.Application.ImplementServices
                 };
             }
 
+            if (!team.Name.Equals("Sales"))
+            {
+                return new ResponseObject<DataResponseProject>
+                {
+                    Status = StatusCodes.Status403Forbidden,
+                    Message = "Bạn không thuộc phòng ban Sales",
+                    Data = null
+                };
+            }
+
             var projectCount = await _baseProjectRepository.CountAsync(x => x.EmployeeCreateId == userId);
 
             if (team.Name.Equals("Sales") && projectCount >= 1)

@@ -102,6 +102,20 @@ namespace PrintMaster.Api.Controllers
             }
         }
 
+        [HttpGet("shippers")]
+        public async Task<IActionResult> GetAllShippers()
+        {
+            try
+            {
+                var response = await _userService.GetAllShipper();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpPost("{userId}/change-department")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles = "Admin")]

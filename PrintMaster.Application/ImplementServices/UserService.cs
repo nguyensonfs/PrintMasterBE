@@ -218,5 +218,19 @@ namespace PrintMaster.Application.ImplementServices
             }
         }
 
+        public async Task<IQueryable<DataResponseUser>> GetAllShipper()
+        {
+            var listUser = await _baseUserRepository.GetAllAsync(x => x.IsDeleted == false);
+            List<User> users = new List<User>();
+            foreach (var user in listUser)
+            {
+                var team = await _baseTeamRepository.GetAsync(x => x.Id == user.TeamId);
+                if (_userRepository.GetRolesOfUserAsync(user).Result.Contains("Deliver"))
+                {
+                    users.Add(user);
+                }
+            }
+            return users.Select(x => _converter.EntityToDTO(x)).AsQueryable();
+        }
     }
 }

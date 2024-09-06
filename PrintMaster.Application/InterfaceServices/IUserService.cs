@@ -17,5 +17,6 @@ namespace PrintMaster.Application.InterfaceServices
         Task<IQueryable<DataResponseUser>> GetAllUserContainsManagerRole();
         Task<IQueryable<DataResponseUser>> GetAllUserContainsLeaderRole();
         Task<IQueryable<DataResponseUser>> GetAllEmployee();
+        Task<IQueryable<DataResponseUser>> GetAllShipper();
     }
 }

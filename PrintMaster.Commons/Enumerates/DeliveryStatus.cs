@@ -4,6 +4,8 @@
     {
         Waiting = 0,
         Delivering = 1,
-        Delivered = 2
+        NotReceived = 2,  
+        Rejected = 3,
+        Delivered = 4,
     }
 }

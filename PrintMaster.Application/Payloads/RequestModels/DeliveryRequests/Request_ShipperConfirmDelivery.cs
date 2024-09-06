@@ -1,9 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using PrintMaster.Commons.Enumerates;
+using System.Text.Json.Serialization;
 
 namespace PrintMaster.Application.Payloads.RequestModels.DeliveryRequests
 {
     public class Request_ShipperConfirmDelivery
     {
-        public Guid DeliveryId { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public DeliveryStatus Status { get; set; }
     }
 }

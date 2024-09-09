@@ -89,7 +89,7 @@ namespace PrintMaster.Infrastructure.Extensions
                         ResourceName = "Machinery",
                         ResourceTypeId = resourceTypeNonConsumable.Id,
                         Image = "https://www.anlocviet.vn/upload/images/van-phong-pham-quan-hai-ba-trung-3.jpg",
-                        AvailableQuantity = 350,
+                        AvailableQuantity = 10,
                         Id = Guid.NewGuid(),
                         IsDeleted = false,
                     },
@@ -98,7 +98,7 @@ namespace PrintMaster.Infrastructure.Extensions
                         ResourceName = "Office supplies",
                         ResourceTypeId = resourceTypeConsumable.Id,
                         Image = "https://png.pngtree.com/thumb_back/fw800/background/20230722/pngtree-metallic-machinery-a-3d-rendered-illustration-for-your-background-image_3781977.jpg",
-                        AvailableQuantity = 10,
+                        AvailableQuantity = 350,
                         Id = Guid.NewGuid(),
                         IsDeleted = false,
                     }
